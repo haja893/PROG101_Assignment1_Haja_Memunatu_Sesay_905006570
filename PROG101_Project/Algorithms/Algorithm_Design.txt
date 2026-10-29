@@ -1,0 +1,24 @@
+COMMUNITY WATER SUPPLY MONITORING AND REPORTING SYSTEM
+STEP-BY-STEP ALGORITHM — PROG101
+
+1. START; initialize complaints as an empty list and reportCount as 0.
+2. Display menu: 1 Submit, 2 Check, 3 Update, 4 Summary, 5 Exit.
+3. Read menuChoice.
+4. IF choice = 1:
+   a. Read residentName, location, problemType, description, severity.
+   b. Repeat input until all required fields are nonempty and severity is an integer from 1 to 3.
+   c. Assign High for 3, Medium for 2, Low for 1.
+   d. Increment reportCount and generate WSR + zero-padded counter (minimum four digits).
+   e. Store the complaint with initial status Pending; show confirmation.
+5. ELSE IF choice = 2: read report ID, search complaint records; show matching complaint or Report Not Found.
+6. ELSE IF choice = 3: verify staff credentials; deny access if invalid. Otherwise search by report ID; if found, repeatedly request status until it is Pending, In Progress, or Resolved; update the record and confirm.
+7. ELSE IF choice = 4: initialize counters; FOR EACH complaint increment total and its status counter; display summary.
+8. ELSE IF choice = 5: display goodbye and END.
+9. ELSE display Invalid Selection.
+10. Repeat from step 2 until choice = 5.
+
+DESIGN ASSUMPTIONS
+- Records and the report counter are held in memory for this logical demonstration.
+- Authorized staff accounts and password verification are conceptual supporting services.
+- In a future implementation, persistent storage must preserve ID uniqueness across restarts.
+- No live application or actual executed tests are claimed.

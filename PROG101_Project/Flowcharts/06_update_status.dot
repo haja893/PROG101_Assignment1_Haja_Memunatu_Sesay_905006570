@@ -1,0 +1,38 @@
+digraph G {
+graph [rankdir=TB, bgcolor="white", nodesep=0.45, ranksep=0.6, pad=0.35];
+node [fontname="DejaVu Sans",fontsize=11,style="filled",fillcolor="white",color="#263548",penwidth=1.5];
+edge [fontname="DejaVu Sans",fontsize=10,color="#263548"];
+a [label="START",shape=ellipse];
+b [label="Input staff credentials",shape=parallelogram];
+c [label="AuthenticateUser",shape=rect];
+d [label="Authorized?",shape=diamond];
+e [label="Display Access Denied",shape=rect];
+f [label="Input report ID; begin FOR EACH complaint",shape=rect];
+g [label="More complaints?",shape=diamond];
+h [label="Report ID matches?",shape=diamond];
+i [label="Next complaint",shape=rect];
+j [label="Display Report Not Found",shape=rect];
+k [label="Display current status; input new status",shape=parallelogram];
+l [label="Valid status?",shape=diamond];
+m [label="Display Invalid Status",shape=rect];
+n [label="Save status; display confirmation",shape=rect];
+o [label="RETURN",shape=ellipse];
+a -> b [label=""];
+b -> c [label=""];
+c -> d [label=""];
+d -> e [label="No"];
+e -> o [label=""];
+d -> f [label="Yes"];
+f -> g [label=""];
+g -> h [label="Yes"];
+g -> j [label="No"];
+j -> o [label=""];
+h -> k [label="Yes"];
+h -> i [label="No"];
+i -> g [label=""];
+k -> l [label=""];
+l -> m [label="No"];
+m -> k [label=""];
+l -> n [label="Yes"];
+n -> o [label=""];
+}

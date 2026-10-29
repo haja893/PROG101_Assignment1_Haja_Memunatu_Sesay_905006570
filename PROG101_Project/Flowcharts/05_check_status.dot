@@ -1,0 +1,27 @@
+digraph G {
+graph [rankdir=TB, bgcolor="white", nodesep=0.45, ranksep=0.6, pad=0.35];
+node [fontname="DejaVu Sans",fontsize=11,style="filled",fillcolor="white",color="#263548",penwidth=1.5];
+edge [fontname="DejaVu Sans",fontsize=10,color="#263548"];
+a [label="START",shape=ellipse];
+b [label="Input report ID",shape=parallelogram];
+c [label="Set found = FALSE; begin FOR EACH complaint",shape=rect];
+d [label="More complaints?",shape=diamond];
+e [label="ID matches?",shape=diamond];
+f [label="Display type, priority, status; set found = TRUE",shape=rect];
+g [label="Next complaint",shape=rect];
+h [label="Found?",shape=diamond];
+i [label="Display Report Not Found",shape=rect];
+j [label="RETURN",shape=ellipse];
+a -> b [label=""];
+b -> c [label=""];
+c -> d [label=""];
+d -> e [label="Yes"];
+d -> h [label="No"];
+e -> f [label="Yes"];
+e -> g [label="No"];
+g -> d [label=""];
+f -> j [label=""];
+h -> j [label="Yes"];
+h -> i [label="No"];
+i -> j [label=""];
+}

@@ -1,0 +1,182 @@
+COMMUNITY WATER SUPPLY MONITORING AND REPORTING SYSTEM
+PROG101 – LANGUAGE-INDEPENDENT PSEUDOCODE
+
+CONSTANT MIN_SEVERITY = 1
+CONSTANT MAX_SEVERITY = 3
+CONSTANT DEFAULT_STATUS = "Pending"
+
+DECLARE complaints AS LIST OF RECORDS = EMPTY LIST
+DECLARE authorizedUsers AS LIST OF STAFF RECORDS
+DECLARE reportCount AS INTEGER = 0
+
+PROCEDURE MainMenu()
+    DISPLAY "1. Submit Complaint"
+    DISPLAY "2. Check Complaint Status"
+    DISPLAY "3. Update Complaint Status"
+    DISPLAY "4. Generate Complaint Summary"
+    DISPLAY "5. Exit"
+END PROCEDURE
+
+FUNCTION ValidateInput(name, location, problemType, description, severity) RETURNS BOOLEAN
+    IF TRIM(name) = "" OR TRIM(location) = "" OR
+       TRIM(problemType) = "" OR TRIM(description) = "" THEN
+        RETURN FALSE
+    END IF
+    IF severity IS NOT AN INTEGER THEN
+        RETURN FALSE
+    END IF
+    IF severity < MIN_SEVERITY OR severity > MAX_SEVERITY THEN
+        RETURN FALSE
+    END IF
+    RETURN TRUE
+END FUNCTION
+
+FUNCTION AssignPriority(severity) RETURNS STRING
+    IF severity = 3 THEN
+        RETURN "High"
+    ELSE IF severity = 2 THEN
+        RETURN "Medium"
+    ELSE
+        RETURN "Low"
+    END IF
+END FUNCTION
+
+PROCEDURE SubmitComplaint()
+    REPEAT
+        INPUT residentName
+        INPUT location
+        INPUT problemType
+        INPUT description
+        INPUT severity
+        SET isValid = ValidateInput(residentName, location, problemType,
+                                    description, severity)
+        IF isValid = FALSE THEN
+            DISPLAY "Invalid information. Please try again."
+        END IF
+    UNTIL isValid = TRUE
+
+    SET priority = AssignPriority(severity)
+    SET reportCount = reportCount + 1
+    SET reportID = "WSR" + FORMAT_WITH_LEADING_ZEROS(reportCount, 4)
+    SET reportStatus = DEFAULT_STATUS
+    ADD RECORD(reportID, residentName, location, problemType,
+               description, severity, priority, reportStatus) TO complaints
+    DISPLAY "Complaint Submitted Successfully"
+    DISPLAY "Report ID: ", reportID
+    DISPLAY "Priority: ", priority
+    DISPLAY "Status: ", reportStatus
+END PROCEDURE
+
+PROCEDURE CheckStatus()
+    INPUT searchID
+    SET found = FALSE
+    FOR EACH complaint IN complaints
+        IF complaint.reportID = searchID THEN
+            DISPLAY complaint.problemType, complaint.priority, complaint.reportStatus
+            SET found = TRUE
+            EXIT FOR
+        END IF
+    END FOR
+    IF found = FALSE THEN
+        DISPLAY "Report Not Found"
+    END IF
+END PROCEDURE
+
+FUNCTION AuthenticateUser(username, password) RETURNS BOOLEAN
+    FOR EACH user IN authorizedUsers
+        IF user.username = username AND
+           VerifyPassword(password, user.passwordHash) = TRUE THEN
+            RETURN TRUE
+        END IF
+    END FOR
+    RETURN FALSE
+END FUNCTION
+
+PROCEDURE UpdateStatus()
+    INPUT username
+    INPUT password
+    IF AuthenticateUser(username, password) = FALSE THEN
+        DISPLAY "Access Denied"
+        RETURN
+    END IF
+
+    INPUT searchID
+    SET found = FALSE
+    FOR EACH complaint IN complaints
+        IF complaint.reportID = searchID THEN
+            SET found = TRUE
+            DISPLAY "Current Status: ", complaint.reportStatus
+            REPEAT
+                INPUT newStatus
+                IF newStatus != "Pending" AND
+                   newStatus != "In Progress" AND
+                   newStatus != "Resolved" THEN
+                    DISPLAY "Invalid Status"
+                END IF
+            UNTIL newStatus = "Pending" OR
+                  newStatus = "In Progress" OR
+                  newStatus = "Resolved"
+            SET complaint.reportStatus = newStatus
+            DISPLAY "Status Updated Successfully"
+            EXIT FOR
+        END IF
+    END FOR
+    IF found = FALSE THEN
+        DISPLAY "Report Not Found"
+    END IF
+END PROCEDURE
+
+PROCEDURE GenerateSummary()
+    SET pendingCount = 0
+    SET progressCount = 0
+    SET resolvedCount = 0
+    SET totalCount = 0
+    FOR EACH complaint IN complaints
+        SET totalCount = totalCount + 1
+        IF complaint.reportStatus = "Pending" THEN
+            SET pendingCount = pendingCount + 1
+        ELSE IF complaint.reportStatus = "In Progress" THEN
+            SET progressCount = progressCount + 1
+        ELSE IF complaint.reportStatus = "Resolved" THEN
+            SET resolvedCount = resolvedCount + 1
+        END IF
+    END FOR
+    DISPLAY "Total Complaints: ", totalCount
+    DISPLAY "Pending: ", pendingCount
+    DISPLAY "In Progress: ", progressCount
+    DISPLAY "Resolved: ", resolvedCount
+END PROCEDURE
+
+BEGIN MAIN
+    REPEAT
+        CALL MainMenu()
+        INPUT menuChoice
+        IF menuChoice = 1 THEN
+            CALL SubmitComplaint()
+        ELSE IF menuChoice = 2 THEN
+            CALL CheckStatus()
+        ELSE IF menuChoice = 3 THEN
+            CALL UpdateStatus()
+        ELSE IF menuChoice = 4 THEN
+            CALL GenerateSummary()
+        ELSE IF menuChoice = 5 THEN
+            DISPLAY "Thank you for using the system"
+        ELSE
+            DISPLAY "Invalid Selection"
+        END IF
+    UNTIL menuChoice = 5
+END MAIN
+
+NOTE: This is design pseudocode, not executable source code.
+The authorizedUsers records and VerifyPassword operation represent a proposed
+future authentication mechanism; they are not implemented in this assignment.
+
+DESIGN ASSUMPTIONS AND VERIFICATION NOTES
+1. The complaints list and reportCount are shared across modules during one session.
+   A future implementation would persist them between sessions to avoid reused IDs.
+2. FORMAT_WITH_LEADING_ZEROS(counter, 4) means at least four digits;
+   counter 1 -> WSR0001 and counter 10000 -> WSR10000.
+3. ValidateInput checks that severity is an integer before comparing its range.
+4. authorizedUsers and VerifyPassword are conceptual design components only.
+5. Each flowchart's RETURN returns control to the main menu; the Exit choice ends it.
+6. This document describes expected behavior; no executable program was tested.
